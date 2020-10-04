@@ -220,7 +220,7 @@
                                     <li class="grid-item wow fadeInUp">
                                         <figure>
                                             <div class="blog-img bg-extra-dark-gray">
-                                                <a href="{{ $book['amazonLink'] }}" target="_blank"><img class="book-cover-img" src="{{ $book['coverLarge'] }}" alt="book-cover"></a>
+                                                <a href="{{ $book['amazonLink'] }}" target="_blank"><img class="book-cover-img" src="{{ $book['coverLarge'] }}" alt="book-cover" style="object-fit: cover;"></a>
                                             </div>
                                             <figcaption>
                                                 <div class="portfolio-hover-main text-left">
