@@ -48,7 +48,7 @@
             <input type="text" class="form-control" id="isbn10Identifier" placeholder="Enter isbn 10 identifier" name="isbn10Identifier" value=
                 "{{ isset($book['isbn10Identifier']) ? $book['isbn10Identifier'] : 
                     ( 
-                        isset( $book['volumeInfo']['industryIdentifiers'][0]['identifier'] ) || isset( $book['volumeInfo']['industryIdentifiers'][1]['identifier'] ) ? 
+                        ( ( isset( $book['volumeInfo']['industryIdentifiers'][0]['identifier'] ) || isset( $book['volumeInfo']['industryIdentifiers'][1]['identifier'] ) ) && $book['volumeInfo']['industryIdentifiers'][0]['type'] != 'OTHER' ) ? 
                         (
                             $book['volumeInfo']['industryIdentifiers'][0]['type']  == 'ISBN_10' ?
                                 $book['volumeInfo']['industryIdentifiers'][0]['identifier']  : 
@@ -64,9 +64,9 @@
         <div class="form-group">
             <label for="isbn13Identifier" >isbn 13 Identifier:</label>
             <input type="text" class="form-control" id="isbn13Identifier" placeholder="Enter isbn 13 identifier" name="isbn13Identifier" value=
-                "{{ isset($book['isbn10Identifier']) ? $book['isbn10Identifier'] : 
+                "{{ isset($book['isbn13Identifier']) ? $book['isbn13Identifier'] : 
                         ( 
-                            isset( $book['volumeInfo']['industryIdentifiers'][0]['identifier'] ) || isset( $book['volumeInfo']['industryIdentifiers'][1]['identifier'] ) ? 
+                            ( ( isset( $book['volumeInfo']['industryIdentifiers'][0]['identifier'] ) || isset( $book['volumeInfo']['industryIdentifiers'][1]['identifier'] ) ) && $book['volumeInfo']['industryIdentifiers'][0]['type'] != 'OTHER' ) ? 
                             (
                                 $book['volumeInfo']['industryIdentifiers'][0]['type'] == 'ISBN_13' ?
                                     $book['volumeInfo']['industryIdentifiers'][0]['identifier']  : 

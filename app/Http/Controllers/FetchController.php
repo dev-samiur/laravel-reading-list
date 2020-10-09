@@ -26,6 +26,8 @@ class FetchController extends Controller
 
     public function show($id){
 
+        $index= -1;
+
         try{
 
             $book= Http::get('https://www.googleapis.com/books/v1/volumes?q='. $id)->body();
@@ -38,29 +40,44 @@ class FetchController extends Controller
 
         $book= json_decode($book, true);
 
-        $book['items'][0]['slug']= Str::slug( $book['items'][0]['volumeInfo']['title'], '-');
+        for($i=0; $i<count( $book['items'] ); $i++) 
+        {
+            if( $book['items'][$i]['id'] == $id )
+            {
+                $index= $i;
+                break;
+            }
+        }
+        //dd($index);
 
-        if( isset( $book['items'][0]['volumeInfo']['publishedDate'] ) )
-            $book['items'][0]['publishedYear']= substr( $book['items'][0]['volumeInfo']['publishedDate'], 0, 4);
+        if($index == -1)
+        {
+            return view('pages.create', ['error' => 'Book not found']);
+        }
 
-        if( isset( $book['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier'] ) )
-            if( $book['items'][0]['volumeInfo']['industryIdentifiers'][0]['type'] == 'ISBN_13')
-                $book= $this->setCovers($book);
+        $book['items'][$index]['slug']= Str::slug( $book['items'][$index]['volumeInfo']['title'], '-');
 
-        else if( isset( $book['items'][0]['volumeInfo']['industryIdentifiers'][1]['identifier'] ) )
-            if( $book['items'][0]['volumeInfo']['industryIdentifiers'][1]['type'] == 'ISBN_13' )
-                $book= $this->setCovers($book);
+        if( isset( $book['items'][$index]['volumeInfo']['publishedDate'] ) )
+            $book['items'][$index]['publishedYear']= substr( $book['items'][$index]['volumeInfo']['publishedDate'], 0, 4);
 
-        return view('pages.create', ['bookDetails' => $book]);
+        if( isset( $book['items'][$index]['volumeInfo']['industryIdentifiers'][0]['identifier'] ) )
+            if( $book['items'][$index]['volumeInfo']['industryIdentifiers'][0]['type'] == 'ISBN_13')
+                $book= $this->setCovers($book, $index);
+
+        else if( isset( $book['items'][$index]['volumeInfo']['industryIdentifiers'][1]['identifier'] ) )
+            if( $book['items'][$index]['volumeInfo']['industryIdentifiers'][1]['type'] == 'ISBN_13' )
+                $book= $this->setCovers($book, $index);
+
+        return view('pages.create', ['bookDetails' => $book, 'index' => $index]);
     }
 
-    private function setCovers($book){
+    private function setCovers($book, $index){
 
-        $isbn13=  $book['items'][0]['volumeInfo']['industryIdentifiers'][0]['type']  == 'ISBN_13' ? $book['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier'] : $book['items'][0]['volumeInfo']['industryIdentifiers'][1]['identifier'];
+        $isbn13=  $book['items'][$index]['volumeInfo']['industryIdentifiers'][0]['type']  == 'ISBN_13' ? $book['items'][$index]['volumeInfo']['industryIdentifiers'][0]['identifier'] : $book['items'][$index]['volumeInfo']['industryIdentifiers'][1]['identifier'];
         
-        $book['items'][0]['volumeInfo']['imageLinks']['coverSmall']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-S.jpg';
-        $book['items'][0]['volumeInfo']['imageLinks']['coverMedium']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-M.jpg';
-        $book['items'][0]['volumeInfo']['imageLinks']['coverLarge']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-L.jpg';
+        $book['items'][$index]['volumeInfo']['imageLinks']['coverSmall']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-S.jpg';
+        $book['items'][$index]['volumeInfo']['imageLinks']['coverMedium']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-M.jpg';
+        $book['items'][$index]['volumeInfo']['imageLinks']['coverLarge']= 'http://covers.openlibrary.org/b/ISBN/'. $isbn13 .'-L.jpg';
 
         return $book;
     }

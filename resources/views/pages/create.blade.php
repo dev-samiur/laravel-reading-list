@@ -13,6 +13,13 @@
             </div>
         @endif
 
+        @if ( !empty($error) )
+             <div class="alert alert-danger" style="margin: 50px 0px;">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Error!</strong> {{ $error }}
+            </div>
+        @endif
+
         <h1 class="header-create">Create</h1>
 
         <form action="{{ url('/dashboard/search') }}" method="POST" style="margin: 50px 0px;">
@@ -38,7 +45,7 @@
         @endif
 
         @if ( !empty($bookDetails) ) 
-            @include('pages.bookform', ['book' => $bookDetails['items'][0], 'operation' => 'create'])  
+            @include('pages.bookform', ['book' => $bookDetails['items'][$index], 'operation' => 'create'])  
         @endif 
 
     </div>
